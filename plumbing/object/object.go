@@ -85,6 +85,8 @@ type Signature struct {
 	Email string
 	// When is the timestamp of the signature.
 	When time.Time
+	// WhenRaw is the original timestamp from git
+	WhenRaw string
 }
 
 // Decode decodes a byte slice into a signature
@@ -127,6 +129,8 @@ func (s *Signature) decodeTimeAndTimeZone(b []byte) {
 		space = len(b)
 	}
 
+	s.WhenRaw = string(b)
+
 	ts, err := strconv.ParseInt(string(b[:space]), 10, 64)
 	if err != nil {
 		return
@@ -156,7 +160,7 @@ func (s *Signature) encodeTimeAndTimeZone(w io.Writer) error {
 	if u < 0 {
 		u = 0
 	}
-	_, err := fmt.Fprintf(w, "%d %s", u, s.When.Format("-0700"))
+	_, err := fmt.Fprintf(w, "%s", s.WhenRaw)
 	return err
 }
 
